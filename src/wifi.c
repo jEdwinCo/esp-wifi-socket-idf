@@ -1,21 +1,21 @@
 /*
 * source based in
-https://github.com/espressif/esp-idf/blob/master/examples/performance/tcp_perf/main/tcp_perf.h
+https://github.com/espressif/esp-idf/tree/master/examples/performance/tcp_perf
 */
+
+#define LOG_LOCAL_LEVEL ESP_LOG_VERBOSE
+#define TAG "wifi:"
+
 #include "wifi.h"
 #include <string.h>
 #include <sys/socket.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/event_groups.h"
+
 #include "esp_wifi.h"
 #include "esp_event_loop.h"
 #include "esp_log.h"
 
 #define EXAMPLE_DEFAULT_SSID CONFIG_WIFI_SSID
 #define EXAMPLE_DEFAULT_PWD  CONFIG_WIFI_PASSWORD
-#define TAG "tcp_perf:"
-#define WIFI_CONNECTED_BIT BIT0
 
 /* FreeRTOS event group to signal when we are connected to wifi */
 EventGroupHandle_t tcp_event_group;
@@ -59,8 +59,9 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
 void wifi_init_sta()
 {
     tcp_event_group = xEventGroupCreate();
-
-    //tcpip_adapter_init();
+    xEventGroupClearBits(tcp_event_group, WIFI_CONNECTED_BIT);
+    
+    tcpip_adapter_init();
     ESP_ERROR_CHECK(esp_event_loop_init(event_handler, NULL) );
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
